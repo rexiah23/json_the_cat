@@ -1,20 +1,18 @@
 const request = require('request');
-const [ breed ] = process.argv.slice(2);
 
-request('https://api.tecatapi.com/v1/breeds/search?q=' + breed, {json: true}, (err, res, body) => {
-  if (err) {
-    console.log('this ran');
-    if (err.errno === -3008) {
-      console.log('ERROR IS :', err);
+const fetchBreedDescription = (breed, callback) => {
+  request('https://api.thecatapi.com/v1/breeds/search?q=' + breed, {json: true}, (err, res, body) => {
+    if (err) {
+      return callback(err);
     }
 
-    return;
-  }
+    if (JSON.stringify(body) === JSON.stringify([])) {
+      return callback('Breed not available/found');
+    }
 
-  if (JSON.stringify(body) === JSON.stringify([])) {
-    console.log('Breed is not found');
-    return;
-  }
+    return callback(err, body[0].description);
+  });
+};
 
-  console.log(body[0]['description']);
-});
+module.exports = { fetchBreedDescription };
+
